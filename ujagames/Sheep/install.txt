@@ -1,0 +1,63 @@
+Readme.txt
+
+------------------------------------------------
+Installationsanleitung Ballonschiessen (ballons)
+------------------------------------------------
+
+Lokale Installation:
+--------------------
+1. Entpacke das Archiv in ein Verzeichnis deiner Wahl, z.B. spiele/schafe
+2. Wechsele in dieses Verzeichnis rufe auf:
+   qmake ballons.pro  (Erstellen des Makefiles)
+   make               (compilieren, linken)
+
+3. Auf der Desktop-Oberfläche erstelle eine neue Programmverknüpfung:
+   Lasche Allgemein:
+   Name: Ballonschiessen
+   Icon: sonstige Symbole, auswählen,
+         z.B. ballon_0002.png im Verzeichnis images/
+   Lasche Programm:
+   Beschreibung: sinnlos herumballern, einfach abreagieren!
+   Befehl: der_pfad_deiner_wahl/ballons 
+   Workpath: der_pfad_deiner_wahl
+         
+4. Tip: 
+   Gefaellt dir der beigefarbene Ballon mit dem Stern nicht,
+   so kopiere ein 32x48 bis 32*64 grosses Bild nach userpics
+   und trage es in die gameparm.ini ein nach folgendem Muster:
+   Name;./userpics/dateiname; Kommentar
+   z.B. so:
+   mein Lieblingsballon;./userpics/liebling.png; Ich krieg dich schon noch!
+   Er ersetzt bei Anwahl aus dem 2.Menu den beigefarbenen Ballon.
+   
+   Es gibt insgesamt 8 Plaetze fuer Userballons.
+   
+----------------------------------------------------------------------------------------
+Bekannte Probleme:
+----------------------------------------------------------------------------------------
+Es kommen jede Menge Warnungen
+
+Kann man getrost ignorieren (Qt-Sprite Lib und Anzeigen, die ist nicht "geputzt", 
+aber dafür doppelt so schnell)
+
+
+make sagt: nichts zu tun, aber ./ballons lässt sich nicht starten
+-----------------------------------------------------------------
+1. Überprüfe nochmal die Pfade, die Unterverzeichnisse sollten im 
+   gleichen Verzeichnis liegen wie schafe.pro (da,
+   wo du im Icon den Arbeitspfad eingetragen hast).
+
+2. Lösche in dem Verzeichnis (deiner Wahl), in dem schafe.pro liegt, 
+   alle *.o und moc*.*-Dateien
+   starte nochmal mit Punkt 2 der Installation
+
+3. Starte das Spiel von der Konsole aus und achte auf Fehlermeldungen
+   Alle Grafiken vollständig?
+   
+
+Die Bestenliste ist korrupt/zerstört/von Freaks blockiert
+---------------------------------------------------------
+Starte das Programm, Menu Spiel: Bestenliste zurücksetzen
+
+-------------------------------------------------------------------------------------------
+uja, 30.08.2004
