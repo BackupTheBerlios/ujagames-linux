@@ -1,0 +1,31 @@
+Changelog spooky shooter
+========================
+
+V.050215:
+---------
+20:00 MEZ: updated install files, no more editing (hopefully)
+added program icon
+added licenses and homepages of the authors
+output of Qmake channeled to spooky
+directory images cleaned up
+updated pause- and gover- images
+Typos corrected 
+
+V.050214 (first release for KDE):
+---------------------------------
+added installation scripts for
+english/aRts - Sound
+german /aRts - Sound
+english/NAS  - Sound
+german /NAS  - Sound
+
+V.050212:
+---------
+added aRts sound
+added barn scene with little monster
+
+V.050204: 
+---------
+first release for gamecraft.de
+Introduction to forums.gentoo.org
+===================================================

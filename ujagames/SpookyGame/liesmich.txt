@@ -1,0 +1,25 @@
+Readme Spooky Shooter für aRts (KDE) Soundserver
+-------------------------------------------------
+
+Spooky Shooter: (c) Ulrike Jahnke-Soltau (uja)
+aRts-Plugin   : (c) Kevin Krammer
+
+Voraussetzungen:
+----------------
+Linux, KDE3, aRts-Soundserver, Qt3
+Wird kein aRts gefunden wird versucht, NAS zu nehmen,
+ist auch kein NAS vorhanden, bleibt alles stumm.
+------------------------------------------------------
+
+Installation:
+-------------
+
+Starte ./install_spooky_arts_deu.cmd und lasse ihn durchlaufen
+
+--------------------------------------------------------------------------------------
+
+Sollte kein aRts - Soundserver vorhanden sein, 
+./install_spooky_nas_deu.cmd
+aufrufen. Damit installiert sich die NAS-Version, die auch ohne Sound zurechtkommt.
+======================================================================================
+
