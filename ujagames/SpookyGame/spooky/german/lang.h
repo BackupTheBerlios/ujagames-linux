@@ -55,4 +55,21 @@
 #define TITELBILD  "./images/titel.png"     // Titel-Schmuckbild
 // ------------------------------------------------------------------------------------
 
+// messages:
+#define _NIX         " "
+#define _MAGAZINLEER "Du musst nachladen!"
+#define _HEXETOT     "Warum hast du due arme, alte Frau getötet?"
+#define _KATZETOT    "Du hast Fritz erschossen!"
+#define _BATTOT      "Du hast eine Fledermaus erwischt!"
+#define _GHOULTOT    "Djinnus wurde eliminiert!"
+#define _CLOWNTOT    "Du hast Poopsy getroffen!"
+#define _GEISTTOT    "Bravo, Ghostkilla!"
+#define _KUERBISTOT  "Heute gibt es Kürbissuppe!"
+#define _SPINNETOT   "Armes Spinnchen!"
+#define _FLOHTOT     "Die Hunde werden dir dankbar sein!"
+#define _PILZTOT     "Du hast einen Floh aufgescheucht!"
+#define _SKORPIONTOT "Didis Clique ist dezimiert worden!"
+#define _KAEFERTOT   "... der arme, kleine Marienkäfer!"
+#define _RATTETOT    "Arties Clan ist um 1 Ratte ärmer!"
+#define _FLAMMETOT   "Du hast ein Elmsfeuerchen entladen!"
 #endif

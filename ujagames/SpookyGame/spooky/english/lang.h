@@ -54,4 +54,21 @@
 #define INFOFILE   "./english/about.rtf"  
 // ------------------------------------------------------------------------------------
 
+// messages:
+#define _MAGAZINLEER "You must reload your gun!"
+#define _HEXETOT     "Why did you kill that poor old woman?"
+#define _KATZETOT    "You killed Fritz!"
+#define _BATTOT      "You killed a bat!"
+#define _GHOULTOT    "You killed Djinnus!"
+#define _CLOWNTOT    "You killed Poopsy!"
+#define _GEISTTOT    "Bravo, Ghostkilla!"
+#define _KUERBISTOT  "Pumpkin soup forever!"
+#define _SPINNETOT   "Poor little Spyder!"
+#define _FLOHTOT     "All dogs will be grateful!"
+#define _PILZTOT     "You just woke up a flea!"
+#define _SKORPIONTOT "Didi's gang lost a member!"
+#define _KAEFERTOT   "You killed that sweet little Ladybug!"
+#define _RATTETOT    "Arty's Clan lost a member!"
+#define _FLAMMETOT   "You discharged an St.Elmo's fire!"
+
 #endif
