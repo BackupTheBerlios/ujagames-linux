@@ -63,6 +63,7 @@ for i in $( ls moc*  )
 do 
   rm $i
 done
+rm ./arts/moc*
 rm Makefile
 
 echo "... done!"
@@ -84,14 +85,16 @@ cat >spooky.pro<<ENDCAT
 # spooky.pro - generiert von bash
 ##################################
 TEMPLATE = app
-INCLUDEPATH += . ./english ./arts_plugin $ARTSINCLUDE
+CONFIG += qt
+TARGET = spooky
+
+INCLUDEPATH += . ./english ./arts ./arts_plugin $ARTSINCLUDE
 LIBS        += -lsoundserver_idl -L$KDELIBS
 
-# CONFIG += qt debug
-
 # Input
-HEADERS +=  english/lang.h config.h gamelib.h window.h wiese.h lala_arts.h arts_plugin/arts.h
-SOURCES +=  main.cpp gamelib.cpp window.cpp wiese.cpp lala_arts.cpp arts_plugin/arts.cpp
+HEADERS +=  english/lang.h config.h gamelib.h window.h wiese.h arts/lala.h arts_plugin/arts.h
+SOURCES +=  main.cpp gamelib.cpp window.cpp wiese.cpp arts/lala.cpp arts_plugin/arts.cpp
+
 ENDCAT
 
 echo "*.pro file done"

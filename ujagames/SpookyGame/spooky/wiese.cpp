@@ -24,31 +24,37 @@ wiese::wiese(QWidget* parent)
   aktiv=false;
   pausiert=false;
 
-  mond  =new flieger(0); mond->vx=1; mond->y=0; mond->y=OFY+8;
+  mond  =new flieger(0); mond->vx=0.5; mond->y=0; mond->y=OFY+8;
   spinne=new flieger(1); spinne->vy=4; spinne->z=31; spinne->phase=-1;
   katze =new flieger(2); katze->z=21;
   waber=new flieger(3);  waber->z=21;
   clown=new flieger(4);  clown->z=21;
 
   // Ebenen 2-9,12-19,22-29: Bahnen fuer Hexen, Geiser, Kuerbisse:
-  for (i=0; i<4; i++) { hexe[i]=new flieger(i+5); kuerbis[i]=new flieger(i+9); }
-  for (i=0; i<8; i++) { bat[i]=new flieger(i+13); geist[i]=new flieger(i+21);  }
+  for (i=0; i<num_hexe; i++)    hexe[i]=new flieger(i+5);
+  for (i=0; i<num_kuerbis; i++) kuerbis[i]=new flieger(i+9);
+  for (i=0; i<num_bat; i++)     bat[i]=new flieger(i+13); 
+  for (i=0; i<num_geist; i++)   geist[i]=new flieger(i+21);
   
 
 // printf("Level 2:\n");
   pilz=new flieger(29); 
   floh=new flieger(30); 
-  for (i=0; i<3; i++) skorpion[i]=new flieger(31+i);
-  skorpion[0]->y=double(YMAX-64);  skorpion[0]->z=27.8;
-  skorpion[1]->y=double(YMAX-128); skorpion[1]->z=23.8;
-  skorpion[2]->y=double(YMAX-144); skorpion[2]->z=17.8;
+  for (i=0; i<num_skorpion; i++) skorpion[i]=new flieger(31+i);
+  skorpion[0]->y=double(YMAX-64);  skorpion[0]->z=29.6;
+  skorpion[1]->y=double(YMAX-128); skorpion[1]->z=24.6;
+  skorpion[2]->y=double(YMAX-144); skorpion[2]->z=17.6;
  
   // level 3:
   monster=new flieger(33);
-  monster->z=29.8; // direkt hinter Trog
+  for (i=0; i<num_ratte; i++) { ratte[i]=new flieger(i+34); ratte[i]->z=20.2+i; }
   
-   
-  for (i=0; i<40; i++) psprite[i]=new flieger(40+i); 
+  // Level 4:
+  for (i=0; i<num_flamme; i++) { flamme[i]=new flieger(i+37); flamme[i]->z=7.3+i; }
+  
+  
+  // ---------------------------------------------------------------------
+  for (i=0; i<num_psprites; i++) psprite[i]=new flieger(num_psprites+i); 
   punkte=0;
   tic=35;
   
@@ -68,12 +74,15 @@ void wiese::move_all()
     move_clown();
     move_floh();
     move_monster();
-    if (rand()%500<1) starte_kuerbis(); for (i=0; i<4; i++) if (kuerbis[i]->phase>=0) move_kuerbis(i);
-    if (rand()%250<1) starte_hexe();    for (i=0; i<4; i++) if (hexe[i]->phase>=0) move_hexe(i);
-    if (rand()%250<1) starte_geist();   for (i=0; i<8; i++) if (geist[i]->phase>=0) move_geist(i);
-    for (i=0; i<8; i++) if (bat[i]->phase>=0) move_bat(i);
-    for (i=0; i<3; i++) move_skorpion(i);
-    for (i=0; i<40; i++) 
+    if (rand()%350<1) starte_kuerbis(); for (i=0; i<num_kuerbis; i++) if (kuerbis[i]->phase>=0) move_kuerbis(i);
+    if (rand()%100<1) starte_hexe();    for (i=0; i<num_hexe; i++) if (hexe[i]->phase>=0) move_hexe(i);
+    if (rand()%100<1) starte_geist();   for (i=0; i<num_geist; i++) if (geist[i]->phase>=0) move_geist(i);
+    if (rand()%10<1)  starte_flammen(); for (i=0; i<num_flamme; i++) if (flamme[i]->phase>=0) move_flamme(i);
+
+    for (i=0; i<num_bat; i++) if (bat[i]->phase>=0) move_bat(i);
+    for (i=0; i<num_skorpion; i++) move_skorpion(i);
+    for (i=0; i<num_ratte; i++) if (ratte[i]->phase>=0) move_ratte(i);    
+    for (i=0; i<num_psprites; i++) 
     { if (psprite[i]->phase>=0) psprite[i]->phase--;
       if (psprite[i]->phase<0) psprite[i]->p_sprite->hide();
     }  
@@ -86,23 +95,22 @@ void wiese::move_all()
 void wiese::move_mond() 
 { if (aktiv) 
   { mond->move_it(); 
-    if (mond->x>XMAX) 
-    { mond->phase++; 
-      if (waber->phase>=0) { waber->phase=-1; waber->p_sprite->hide(); }
-      waber->count=0;
-      if (mond->phase<3) { mond->set_koords(-OFX,8); mond->p_sprite->setFrame(mond->phase); } else game_over();
-    }
+    emit scrollit(int(mond->x));
+    if (mond->x>XMAX) game_over();
   }
 }
 
-void wiese::mond_getroffen() { emit play_lala(sound_on,0); for (int i=0; i<8; i++) starte_bat(); }
+void wiese::mond_getroffen() { emit play_lala(sound_on,0); for (int i=0; i<num_bat; i++) starte_bat(); }
 
 
 // rund um die Spinne: Bewegungsmuster: erst runter, dann hoch mit je Speed 8 ----------------------------
 // -------------------------------------------------------------------------------------------------------
-void wiese::starte_spinne() 
-{ int k=rand()%XMAX; 
-  spinne->vx=0; spinne->vy=8; 
+void wiese::starte_spinne() // nur +- 1 Screenbreite vom Cursor 
+{ int k=rand()%1280-640; 
+  k=k+int(hotspot->x());
+  if (k<0) k=0; else if (k>XMAX-128) k=XMAX-128;
+  spinne->vx=0; spinne->vy=8;
+  spinne->set_tiefe(32); 
   spinne->set_koords(k,-OFY); spinne->p_sprite->show();
   spinne->phase=0;
 }
@@ -119,21 +127,24 @@ void wiese::spinne_getroffen()
 { int gain=100;
   punkte=punkte+gain;
   spinne->phase=-1; spinne->p_sprite->hide();
-  emit punkte_changed(punkte);
   zeige_punkte(spinne,gain);
+  emit punkte_changed(punkte);
+  emit messi(_SPINNETOT);
   emit play_lala(sound_on,1);
 }
 // ---------------------------------------------------------------------------------------------------------
 
 // rund um die Katze, sie erscheint an den 13 Fenstern des Schlosses und verscwindet wieder:
 // ------------------------------------------------------------------------------------------
-void wiese::starte_katze() 
-{ int kx[13]={288,340, 196,246,296,342,382, 144,132,144, 448,436,448}; 
-  int ky[13]={168,168, 216,216,216,216,216, 164,210,268, 194,224,276};
-  int k=rand()%13; 
-  if (k<2) katze->p_sprite->setZ(11); else katze->p_sprite->setZ(21);
-  katze->set_koords(kx[k],ky[k]); katze->p_sprite->show();
-  katze->phase=50;
+void wiese::starte_katze() // nur, wenn Schloss sichtbar
+{ if (hotspot->x()<1024)
+  { int kx[13]={288,340, 196,246,296,342,382, 144,132,144, 448,436,448}; 
+    int ky[13]={168,168, 216,216,216,216,216, 164,210,268, 194,224,276};
+    int k=rand()%13; 
+    if (k<2) katze->set_tiefe(11); else katze->set_tiefe(21);
+    katze->set_koords(kx[k],ky[k]); katze->p_sprite->show();
+    katze->phase=50;
+  }  
 }
 
 void wiese::move_katze() // Countdown auf Phase
@@ -148,6 +159,7 @@ void wiese::katze_getroffen()
   katze->phase=-1; katze->p_sprite->hide();
   punkte=punkte+gain;
   emit punkte_changed(punkte);
+  emit messi(_KATZETOT);
   emit play_lala(sound_on,2);
   zeige_punkte(katze,gain);
 
@@ -161,7 +173,8 @@ void wiese::katze_getroffen()
 void wiese::starte_waber()
 { double xx=(topf->x()),yy=(topf->y())-16;
   waber->count=0;
-  waber->phase=200; 
+  waber->phase=200;
+  waber->set_tiefe(21); 
   waber->set_koords(xx,yy);
   waber->p_sprite->setFrame(0); 
   waber->p_sprite->show(); 
@@ -193,6 +206,7 @@ void wiese::ghoul_getroffen()
 { int gain=500;
   punkte=punkte+gain;
   emit punkte_changed(punkte);
+  emit messi(_GHOULTOT);
   waber->phase=-1; 
   waber->p_sprite->hide();
   emit play_lala(sound_on,4); 
@@ -208,6 +222,7 @@ void wiese::starte_clown()
   emit play_lala(sound_on,5);
   clown->phase=32; 
   int k=rand()%2;
+  clown->set_tiefe(21);
   clown->set_koords(schloss[2+k]->x(),schloss[2+k]->y()-48);
   clown->p_sprite->setFrame(2); 
   clown->p_sprite->show(); 
@@ -225,6 +240,7 @@ void wiese::clown_getroffen()
 { int gain=20;
   punkte=punkte+gain;
   emit punkte_changed(punkte);
+  emit messi(_CLOWNTOT);
   clown->phase=-1; 
   clown->p_sprite->hide();
   tuer->setFrame(0); 
@@ -233,7 +249,7 @@ void wiese::clown_getroffen()
 }
 
 // ===============================================================================================================
-// ab hier die "richtigen" Flugsprites, die auf 24 Bahnen zu 3 Tiefengruppen herumschwirren: Hexe, Geist, Kuerbis
+// ab hier die "richtigen" Flugsprites, die auf 24 Bahnen zu 3 Tiefengruppen h k=int(bat[i]->p_sprite->z());   if (bat[i]->phase>=0) frei[k]=false;erumschwirren: Hexe, Geist, Kuerbis
 // ---------------------------------------------------------------------------------------------------------------
 
 // Aussuchen einer freien Bahn aus einer der 3 Gruppen - 
@@ -243,14 +259,9 @@ int wiese::freie_bahn()
 { int i,k,k1=-1,k2=-1,k3=-1;
   bool frei[32];
   for (i=0; i<32; i++) frei[i]=true;  
-  for (i=0; i<4; i++)
-  { k=int(hexe[i]->p_sprite->z());    if (hexe[i]->phase>=0)    frei[k]=false;
-    k=int(kuerbis[i]->p_sprite->z()); if (kuerbis[i]->phase>=0) frei[k]=false;
-  }  
-  for (i=0; i<8; i++)
-  { k=int(bat[i]->p_sprite->z());   if (bat[i]->phase>=0) frei[k]=false;
-    k=int(geist[i]->p_sprite->z()); if (geist[i]->phase>=0) frei[k]=false;
-  }  
+  for (i=0; i<num_hexe; i++)    { k=int(hexe[i]->p_sprite->z()); if (hexe[i]->phase>=0) frei[k]=false; }
+  for (i=0; i<num_kuerbis; i++) { k=int(kuerbis[i]->p_sprite->z()); if (kuerbis[i]->phase>=0) frei[k]=false; }  
+  for (i=0; i<num_geist; i++)   { k=int(geist[i]->p_sprite->z()); if (geist[i]->phase>=0) frei[k]=false; }  
   for (i=2; i<10; i++) 
   { if (frei[i]) k1=i;
     if (frei[i+10]) k2=i+10;
@@ -276,7 +287,7 @@ int wiese::flughoehe(int bahn)
 // ----------------------------------------------------------------
 int wiese::freier_kuerbis()
 { int i,k=-1;
-  for (i=0; i<4; i++) if (kuerbis[i]->phase<0) k=i;
+  for (i=0; i<num_kuerbis; i++) if (kuerbis[i]->phase<0) k=i;
   return k;
 }
 
@@ -319,6 +330,7 @@ void wiese::kuerbis_getroffen(int nr)
   } 
   punkte=punkte+gain; 
   emit punkte_changed(punkte);
+  emit messi(_KUERBISTOT);
   kuerbis[nr]->phase=-1; 
   kuerbis[nr]->p_sprite->hide(); 
   emit play_lala(sound_on,7);
@@ -328,11 +340,7 @@ void wiese::kuerbis_getroffen(int nr)
 
 // Hexen: einmal waagerecht durch die Landschaft
 // ----------------------------------------------------------------
-int wiese::freie_hexe()
-{ int i,k=-1;
-  for (i=0; i<4; i++) if (hexe[i]->phase<0) k=i;
-  return k;
-}
+int wiese::freie_hexe() { int i,k=-1; for (i=0; i<num_hexe; i++) if (hexe[i]->phase<0) k=i; return k; }
 
 void wiese::starte_hexe()
 { int nr=freie_hexe(),bahn=freie_bahn(),fh=flughoehe(bahn);
@@ -368,6 +376,7 @@ void wiese::hexe_getroffen(int nr)
 { int gain=-100;
   punkte=punkte+gain;
   emit punkte_changed(punkte);
+  emit messi(_HEXETOT);
   hexe[nr]->phase=-1; 
   hexe[nr]->p_sprite->hide(); 
   emit play_lala(sound_on,8);
@@ -377,11 +386,7 @@ void wiese::hexe_getroffen(int nr)
 
 // Geist: einmal waagerecht durch die Landschaft, dabei flattern
 // ----------------------------------------------------------------
-int wiese::freier_geist()
-{ int i,k=-1;
-  for (i=0; i<4; i++) if (geist[i]->phase<0) k=i;
-  return k;
-}
+int wiese::freier_geist() { int i,k=-1; for (i=0; i<num_geist; i++) if (geist[i]->phase<0) k=i; return k; }
 
 void wiese::starte_geist()
 { int nr=freier_geist(),bahn=freie_bahn(),fh=flughoehe(bahn);
@@ -419,6 +424,7 @@ void wiese::geist_getroffen(int nr)
   } 
   punkte=punkte+gain; 
   emit punkte_changed(punkte);
+  emit messi(_GEISTTOT);
   geist[nr]->phase=-1; 
   geist[nr]->p_sprite->hide(); 
   emit play_lala(sound_on,9);
@@ -431,7 +437,7 @@ void wiese::geist_getroffen(int nr)
 // -----------------------------------------------------------------------------------
 int wiese::freier_bat()
 { int i,k=-1;
-  for (i=0; i<8; i++) if (bat[i]->phase<0) k=i;
+  for (i=0; i<num_bat; i++) if (bat[i]->phase<0) k=i;
   return k;
 }
 
@@ -479,6 +485,7 @@ void wiese::bat_getroffen(int nr)
 { int gain=100;
   punkte=punkte+gain;
   emit punkte_changed(punkte);
+  emit messi(_BATTOT);
   bat[nr]->phase=-1; 
   bat[nr]->p_sprite->hide(); 
   emit play_lala(sound_on,10);
@@ -490,7 +497,8 @@ void wiese::bat_getroffen(int nr)
 // rechte Seite:
 
 void wiese::starte_pilz()
-{ pilz->p_sprite->show();
+{ pilz->set_tiefe(9.6);
+  pilz->p_sprite->show();
   pilz->phase=0;
 }
 
@@ -510,7 +518,7 @@ void wiese::starte_floh()
 { floh->phase=0;
   floh->count=0;
   floh->vx=-2;
-  floh->set_tiefe(29.8);
+  floh->set_tiefe(30.6);
   floh->p_sprite->setFrame(1);
   floh->set_koords(1280,(YMAX-64));
   floh->p_sprite->show();
@@ -533,6 +541,7 @@ void wiese::floh_getroffen()
 { int gain=200;
   punkte=punkte+gain;
   emit punkte_changed(punkte);
+  emit messi(_FLOHTOT);
   floh->phase=-1; 
   floh->p_sprite->hide();
   emit play_lala(sound_on,14);
@@ -544,39 +553,40 @@ void wiese::floh_getroffen()
 // ---
 
 void wiese::starte_skorpion()
-{ 
-  skorpion[0]->set_koords(1200,skorpion[0]->y); skorpion[0]->vx=-2;
-  skorpion[1]->set_koords(640,skorpion[1]->y); skorpion[1]->vx=2;
-  skorpion[2]->set_koords(960,skorpion[2]->y); if (rand()%2<1) skorpion[2]->vx=-2; else skorpion[2]->vx=-2;
-  
-  for (int i=0; i<3; i++)
-  { skorpion[i]->phase=0;
-    skorpion[i]->count=0;
-    skorpion[i]->vx=-2;
-    if (skorpion[i]->vx<0) skorpion[i]->bildbase=2; else skorpion[i]->bildbase=0;
-    if (i==0) skorpion[i]->bildbase=skorpion[i]->bildbase+4;
-    skorpion[i]->p_sprite->setFrame(skorpion[i]->bildbase);
-    skorpion[i]->p_sprite->setZ(skorpion[i]->z);
-    skorpion[i]->p_sprite->show();
-  }
+{ if (hotspot->x()<1860) // nur sichtbarer Bereich
+  {	
+    skorpion[0]->set_koords(1200,skorpion[0]->y); skorpion[0]->vx=-4; skorpion[0]->bildbase=4;
+    skorpion[1]->set_koords(640,skorpion[1]->y);  skorpion[1]->vx=2;  skorpion[1]->bildbase=0;
+    skorpion[2]->set_koords(960,skorpion[2]->y); if (rand()%2<1) skorpion[2]->vx=-2; else skorpion[2]->vx=-2; skorpion[2]->bildbase=0;
+    for (int i=0; i<num_skorpion; i++)
+    { skorpion[i]->phase=0;
+      skorpion[i]->count=0;
+      if (skorpion[i]->vx<0) skorpion[i]->bildbase=skorpion[i]->bildbase+2;
+      skorpion[i]->p_sprite->setFrame(skorpion[i]->bildbase);
+      skorpion[i]->p_sprite->setZ(skorpion[i]->z);
+      skorpion[i]->p_sprite->show();
+    }
+  } 
 }
 
 void wiese::move_skorpion(int nr)
-{   skorpion[nr]->phase=(skorpion[nr]->phase++)%2;
+{   skorpion[nr]->phase=(skorpion[nr]->phase+1)%2;
     skorpion[nr]->p_sprite->setFrame(skorpion[nr]->bildbase+skorpion[nr]->phase);
+    // Wende rechts:
     if (skorpion[nr]->x>1200) if (skorpion[nr]->vx>0) 
-    { skorpion[nr]->vx=-2; skorpion[nr]->bildbase=2;
-      if (nr==0) { skorpion[nr]->bildbase=skorpion[nr]->bildbase+4; skorpion[nr]->vx=-4; }
+    { skorpion[nr]->vx=-skorpion[nr]->vx; skorpion[nr]->bildbase=2;
+      if (nr==0) skorpion[nr]->bildbase=6;
       skorpion[nr]->p_sprite->setFrame(skorpion[nr]->bildbase); 
       skorpion[nr]->phase=0;
       skorpion[nr]->p_sprite->show();
     }
+    // Wende links:
     double wende=640;
     if (nr>0) wende=wende+144;
     if (skorpion[nr]->x<wende) if (skorpion[nr]->vx<0) 
     { skorpion[nr]->bildbase=0;
-      if (nr==0) { skorpion[nr]->bildbase=skorpion[nr]->bildbase+4; skorpion[nr]->vx=4; }
-      skorpion[nr]->vx=2; 
+      skorpion[nr]->vx=-skorpion[nr]->vx; 
+      if (nr==0) { skorpion[nr]->bildbase=4; skorpion[nr]->vx=4; }
       skorpion[nr]->p_sprite->setFrame(skorpion[nr]->bildbase); 
       skorpion[nr]->phase=0;
       skorpion[nr]->p_sprite->show();
@@ -588,6 +598,7 @@ void wiese::skorpion_getroffen(int nr)
 { int gain=20;
   punkte=punkte+gain;
   emit punkte_changed(punkte);
+  emit messi(_SKORPIONTOT);
   skorpion[nr]->phase=-1; 
   skorpion[nr]->p_sprite->hide();
   emit play_lala(sound_on,15);
@@ -601,11 +612,15 @@ void wiese::starte_monster() // durch nachladen
 { int iw;
   // tuer->setFrame(1);
 //  emit play_lala(sound_on,5);
-  monster->phase=32;
-  if (rand()%3==0)iw=116+rand()%24; else iw=400+rand()%112;
-  monster->set_koords(scheune[0]->x()+iw,320);
-  monster->p_sprite->setFrame(7); 
-  monster->p_sprite->show(); 
+  if (hotspot->x()>640)
+  {
+    monster->phase=32;
+    if (rand()%3==0)iw=116+rand()%24; else iw=400+rand()%112;
+    monster->set_koords(scheune[0]->x()+iw,320);
+    monster->set_tiefe(29.5);
+    monster->p_sprite->setFrame(7); 
+    monster->p_sprite->show(); 
+  }
 }
 
 void wiese:: move_monster()
@@ -620,6 +635,7 @@ void wiese::monster_getroffen()
 { int gain=100;
   punkte=punkte+gain;
   emit punkte_changed(punkte);
+  emit messi(_KAEFERTOT);
   monster->phase=-1; 
   monster->p_sprite->hide();
 //  tuer->setFrame(0); 
@@ -627,15 +643,107 @@ void wiese::monster_getroffen()
   zeige_punkte(monster,gain);
 }
 
+// ----------------------------------------------------------------------------------------------------------------
+// 8 Bats: Start aus Mond, Flug schräg, dabei nach vorne kommen
+// -----------------------------------------------------------------------------------
+
+void wiese::starte_ratten()
+{ int nr; double rx,ry;
+  emit play_lala(sound_on,19);
+  for (nr=0; nr<num_ratte; nr++) if (ratte[nr]->phase<0)
+  { ratte[nr]->phase=0;
+    ratte[nr]->set_tiefe(21.5+0.2*nr);
+    ry=scheune[1]->y()+184+2*nr;
+    rx=scheune[1]->x()+420+random()%100;
+    ratte[nr]->vx=-4;
+    ratte[nr]->vy=0;
+    ratte[nr]->set_koords(rx,ry);
+    ratte[nr]->p_sprite->setFrame(0); 
+    ratte[nr]->p_sprite->show(); 
+  }  
+}
+
+void wiese:: move_ratte(int nr)
+{ if (ratte[nr]->phase>=0)
+  { ratte[nr]->phase++;
+    int ip=ratte[nr]->phase%2;
+    ratte[nr]->phase=ip;
+    if (ratte[nr]->vy<-1) ip=ip+2;
+    ratte[nr]->p_sprite->setFrame(ip);
+    ratte[nr]->move_it();
+    if ((ratte[nr]->x<scheune[1]->x()+192) && (ratte[nr]->x>scheune[1]->x()+188)) 
+    {  ratte[nr]->set_tiefe(25.5+0.2*nr); ratte[nr]->vy=-0.002*(rand()%1000); }
+    if (ratte[nr]->x<scheune[1]->x()+36) { ratte[nr]->phase=-1; ratte[nr]->p_sprite->hide(); }
+  } 
+}
+
+void wiese::ratte_getroffen(int nr)
+{ int gain=100;
+  punkte=punkte+gain;
+  emit punkte_changed(punkte);
+  emit messi(_RATTETOT);
+  ratte[nr]->phase=-1; 
+  ratte[nr]->p_sprite->hide(); 
+  emit play_lala(sound_on,18);
+  zeige_punkte(ratte[nr],gain);
+}
+
+
+// Szene 4: Sumpf:
+void wiese::starte_flammen()
+{ if (hotspot->x()>1280) // nur, wenn sichtbar
+  { int nr;
+    for (nr=0; nr<num_flamme; nr++) if (flamme[nr]->phase<0)
+    { flamme[nr]->vx=0;
+      if (rand()%4<1) // voren
+      { flamme[nr]->phase=0;
+	flamme[nr]->vy=-4;
+        flamme[nr]->set_koords(2048+rand()%512,320+rand()%96);
+        flamme [nr]->p_sprite->setFrame(rand()%6); 
+      }
+      else 
+      { flamme[nr]->phase=6;
+	flamme[nr]->vy=-3;
+        flamme[nr]->set_koords(2200+rand()%320,192+rand()%48);
+        flamme [nr]->p_sprite->setFrame(rand()%6+6); 
+      }	
+      flamme[nr]->p_sprite->show();
+    }
+  }  
+}
+
+void wiese:: move_flamme(int nr)
+{ if (flamme[nr]->phase>=0)
+  { flamme[nr]->phase++; 
+    if (flamme[nr]->phase==6) flamme[nr]->phase=0;
+    else if (flamme[nr]->phase==12) flamme[nr]->phase=6;
+    flamme[nr]->p_sprite->setFrame(flamme[nr]->phase);
+    flamme[nr]->move_it();
+    if (flamme[nr]->y<-OFY) { flamme[nr]->phase=-1; flamme[nr]->p_sprite->hide(); }
+  } 
+}
+
+void wiese::flamme_getroffen(int nr)
+{ int gain=200;
+  if (flamme[nr]->phase<6) gain=50;
+  punkte=punkte+gain;
+  emit punkte_changed(punkte);
+  emit messi(_FLAMMETOT);
+  flamme[nr]->phase=-1; 
+  flamme[nr]->p_sprite->hide(); 
+  emit play_lala(sound_on,20); 
+  zeige_punkte(flamme[nr],gain);
+}
 
 
 
+// ----------------------------------------------------------------------------------------------------------------
 
 // === User interface: ============================================================================================
 // ----------------------------------------------------------------------------------------------------------------
-void wiese::pause()       { aktiv=false; pausiert=true;  p_pause->show(); }
+void wiese::pause()       { aktiv=false; pausiert=true;  p_pause->move(hotspot->x()-128,hotspot->y()-34); p_pause->show(); }
 void wiese::weiter()      { aktiv=true;  pausiert=false; p_pause->hide(); emit focus2playfield();  }
-void wiese::game_over()   { weiter(); aktiv=false; p_gover->show(); emit gameover(punkte); }
+void wiese::game_over()   { weiter(); aktiv=false; p_gover->move(XMAX-440,160); p_gover->show();  emit gameover(punkte); }
 
 
 void wiese::neues_spiel()
@@ -660,15 +768,14 @@ void wiese::neues_spiel()
   starte_skorpion();
   
   tuer->setFrame(0);
-  for (i=0; i<4; i++)
-  { hexe[i]->phase=-1; hexe[i]->p_sprite->hide();
-    kuerbis[i]->phase=-1; kuerbis[i]->p_sprite->hide();
-  }
-  for (i=0; i<8; i++)
-  { bat[i]->phase=-1; bat[i]->p_sprite->hide();
-    geist[i]->phase=-1; geist[i]->p_sprite->hide();
-  }
-  for (i=0; i<40; i++) psprite[i]->p_sprite->hide(); 
+  for (i=0; i<num_hexe; i++)    { hexe[i]->phase=-1; hexe[i]->p_sprite->hide(); }
+  for (i=0; i<num_kuerbis; i++) { kuerbis[i]->phase=-1; kuerbis[i]->p_sprite->hide(); }
+  for (i=0; i<num_bat; i++)     { bat[i]->phase=-1; bat[i]->p_sprite->hide(); }
+  for (i=0; i<num_geist; i++)   { geist[i]->phase=-1; geist[i]->p_sprite->hide(); }
+  for (i=0; i<num_ratte; i++)   { ratte[i]->phase=-1; ratte[i]->p_sprite->hide(); }
+  for (i=0; i<num_flamme; i++)   { flamme[i]->phase=-1; flamme[i]->p_sprite->hide(); }
+  
+  for (i=0; i<num_psprites; i++) psprite[i]->p_sprite->hide();
   emit play_lala(sound_on,16);
   weiter();
 }
@@ -676,20 +783,15 @@ void wiese::neues_spiel()
 void wiese::nachladen() 
 { if (aktiv) { vorrat=NUMBULLETS; emit bullets_changed(vorrat); emit play_lala(sound_on,11); starte_monster(); } }
 
-void wiese::hover(int ix,int iy) { shooter->move(ix-24,iy-24); hotspot->move(ix,iy); emit zeige_view(ix,iy); }
+void wiese::hover(int ix,int iy) { shooter->move(ix-24,iy-24);  hotspot->move(ix,iy); }
 
 // ---------------------------------------------------------------------------------------------
 void wiese::keyhandle(int cc)
-{ int delta=16;
-  if (cc==Qt::Key_P) { if (pausiert) weiter(); else pause(); }
+{ if (cc==Qt::Key_P) { if (pausiert) weiter(); else pause(); }
   else if (cc==Qt::Key_N) neues_spiel();
   else if (cc==Qt::Key_Q) oberer->close();
   else if (cc==Qt::Key_T) { pause(); oberer->setWindowState(Qt::WindowMinimized); } /// TBIC-Taste
-  else if (aktiv)
-  { if ((cc==Qt::Key_Right) || (cc==Qt::Key_S)) emit scrollit(delta);
-  else if ((cc==Qt::Key_Left) || (cc==Qt::Key_A)) emit scrollit(-delta);
-  else if (cc==Qt::Key_Space) nachladen();  
-  }   
+  else if (aktiv) if (cc==Qt::Key_Space) nachladen();  
 }
 // ------------------------------------------------------------------------------------------------
 void wiese::shooterupdate(int dd) 
@@ -700,6 +802,7 @@ void wiese::klick(int ix,int iy)
   double max=-999; 
   bool gefunden=false;
   emit focus2playfield();
+  emit messi(_NIX);
   if (pausiert) weiter();
   else if (aktiv)
   { // weiter(); // keyboard-Patch
@@ -710,20 +813,18 @@ void wiese::klick(int ix,int iy)
       QCanvasItem* gotcha=0;
       QCanvasItemList::Iterator iter;
       for (iter= treffer.begin(); iter != treffer.end(); iter++) 
-      { if ( (*iter)->z()>max) if ( (*iter)->z()<33) // 33=Fadenkreuz 
+      { if ( (*iter)->z()>max) if ( (*iter)->z()<36) // 36=Fadenkreuz 
         { gotcha=*iter;
 	  max=gotcha->z();
         }
       } 
-      for (i=0; i<4; i++) if (!gefunden)
-      { if (gotcha==kuerbis[i]->p_sprite) { gefunden=true; kuerbis_getroffen(i); }
-         else if (gotcha==hexe[i]->p_sprite) { gefunden=true; hexe_getroffen(i); }
-      }
-      for (i=0; i<8; i++) if (!gefunden)
-      { if (gotcha==bat[i]->p_sprite) { gefunden=true; bat_getroffen(i); }
-        else if (gotcha==geist[i]->p_sprite) { gefunden=true; geist_getroffen(i); } 
-      }
-      for (i=0; i<3; i++) if (!gefunden) if (gotcha==skorpion[i]->p_sprite) { gefunden=true; skorpion_getroffen(i); }
+      for (i=0; i<num_kuerbis; i++) if (gotcha==kuerbis[i]->p_sprite) { gefunden=true; kuerbis_getroffen(i); }
+      if (!gefunden) for (i=0; i<num_hexe; i++)  if (gotcha==hexe[i]->p_sprite)  { gefunden=true; hexe_getroffen(i); }
+      if (!gefunden) for (i=0; i<num_bat; i++)   if (gotcha==bat[i]->p_sprite)   { gefunden=true; bat_getroffen(i); }
+      if (!gefunden) for (i=0; i<num_geist; i++) if (gotcha==geist[i]->p_sprite) { gefunden=true; geist_getroffen(i); } 
+      if (!gefunden) for (i=0; i<num_skorpion; i++) if (gotcha==skorpion[i]->p_sprite) { gefunden=true; skorpion_getroffen(i); }
+      if (!gefunden) for (i=0; i<num_ratte; i++) if (gotcha==ratte[i]->p_sprite) { gefunden=true; ratte_getroffen(i); }
+      if (!gefunden) for (i=0; i<num_flamme; i++) if (gotcha==flamme[i]->p_sprite) { gefunden=true; flamme_getroffen(i); }
       if (!gefunden)
       { if (gotcha==mond->p_sprite) mond_getroffen();
         else if (gotcha==spinne->p_sprite) spinne_getroffen(); 
@@ -735,10 +836,12 @@ void wiese::klick(int ix,int iy)
         else if (gotcha==floh->p_sprite) floh_getroffen();
         else if (gotcha==pilz->p_sprite) pilz_getroffen();
 	else if (gotcha==monster->p_sprite) monster_getroffen();
+	else if (gotcha==zielscheibe) starte_ratten();
       }
       vorrat--;
       emit bullets_changed(vorrat);
-    } else emit play_lala(sound_on,13);
+    } 
+    else { emit play_lala(sound_on,13); emit messi(_MAGAZINLEER); }
   }
 }
 

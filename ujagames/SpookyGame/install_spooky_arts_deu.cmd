@@ -67,6 +67,7 @@ for i in $( ls moc*  )
 do 
   rm $i
 done
+rm ./arts/moc*
 rm Makefile
 
 echo Installation erfolgreich
@@ -88,14 +89,16 @@ cat >spooky.pro<<ENDCAT
 # spooky.pro - generiert von bash
 ##################################
 TEMPLATE = app
-INCLUDEPATH += . ./german ./arts_plugin $ARTSINCLUDE
+TARGET = spooky
+
+INCLUDEPATH += . ./german ./arts ./arts_plugin $ARTSINCLUDE
 LIBS        += -lsoundserver_idl -L$KDELIBS
 
-# CONFIG += qt debug
+CONFIG += qt
 
 # Input
-HEADERS +=  german/lang.h config.h gamelib.h window.h wiese.h lala_arts.h arts_plugin/arts.h
-SOURCES +=  main.cpp gamelib.cpp window.cpp wiese.cpp lala_arts.cpp arts_plugin/arts.cpp
+HEADERS +=  german/lang.h config.h gamelib.h window.h wiese.h arts/lala.h arts_plugin/arts.h
+SOURCES +=  main.cpp gamelib.cpp window.cpp wiese.cpp arts/lala.cpp arts_plugin/arts.cpp
 ENDCAT
 
 echo "spooky.pro wurde erstellt"

@@ -24,8 +24,8 @@
 #define BACKGR0   "#220033"   // Aussenfenster Hintergrund
 #define COLOR0    "#ccee99"   // Aussenfenster Textfarbe
 #define BACKGR1   "#334455"   // Spielfeld Hintergrund
-#define COLOR1    "#cccc99"   // Spielfeld Textfarbe
-#define BACKGR2   "#bbcc99"   // Anzeigen Hintergrund
+#define COLOR1    "#ccee99"   // Spielfeld Textfarbe
+#define BACKGR2   "#bbcccc"   // Anzeigen Hintergrund
 #define COLOR2    "#330000"   // Anzeigen Textfarbe 
 #define PAPCOLOR0  "#ccdd99"  // Rahmenfarbe HSCListe
 #define HICOLOR    "#990011"  // Hiscore-Top-Farbe
@@ -53,6 +53,6 @@
 #define DY 32
 #define OFX 80
 #define OFY 32
-#define XMAX 1920   // field dimensions
+#define XMAX 2560   // field dimensions
 #define YMAX 400 
 // ---------------------------------------------------------------------------------

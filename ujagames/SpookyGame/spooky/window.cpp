@@ -75,10 +75,11 @@ void window::setze_view(int x,int y)     { my_view->ensureVisible(x,y); }
 void window::keyPressEvent(QKeyEvent* e) { emit key_pressed(e->key()); }
 void window::grab_focus()                { setFocus(); }
 
-void window::scroll_it(int x)            
-{ int vorher,nachher;
-  vorher=my_view->contentsX(); 
-  my_view->scrollBy(x,0); 
+void window::scroll_it(int x) // abgestimmt auf Mond in Mitte        
+{ int ix=x+40,vorher=my_view->contentsX(),nachher;
+  // das mit dem scrollmarginx war ein griff ins Klo, also Zwangsupdate:
+  my_view->ensureVisible(ix,40,320,40);
+  // my_view->scrollBy(x,0); 
   nachher=my_view->contentsX();
   emit gescrollt(nachher-vorher);
 }

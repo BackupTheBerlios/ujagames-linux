@@ -1,8 +1,46 @@
 Changelog spooky shooter
 ========================
 
-V.050215:
----------
+V.2.02 (22.Feb.2005):
+---------------------
+Swamp lights more flashy images
+Swamp lights sound and remarks
+Swamp lights score changed
+
+
+V2.01 (21.Feb.2005):
+------------------------
+Rat moving adjusted
+Added swamp scene (screen 4)
+Added swamp lights
+Motion of sprites restricted to cursor +- screensize
+Release rate of sprites adjusted to new canvas size
+
+To do: swamp lights sound and remarks
+
+
+V.2.00 (will be a separate version)
+-----------------------------------
+The berliOS version SpookyGame2, 20.Feb.2005
+
+no more self-scrolling, the landscape shifts with the moon
+1 moon pass only 
+(no more Orion or Venus, the game lasted apparently too long)
+added barnyard scene (screen 3)
+sprite handling optimized for future sprites
+some scorpion glitches corrected
+added message box with stupid remarks
+
+===============================================================
+
+V.1.00 
+-------
+The berliOs version SpookyGame1, identical to V.050212-20:00
+
+===============================================================
+
+V.050215
+--------
 20:00 MEZ: updated install files, no more editing (hopefully)
 added program icon
 added licenses and homepages of the authors

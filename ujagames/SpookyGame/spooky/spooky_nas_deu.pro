@@ -5,12 +5,12 @@
 TEMPLATE = app
 TARGET = spooky
 
-INCLUDEPATH += . ./german
+INCLUDEPATH += . ./german ./nas
 
-# CONFIG += qt debug
+CONFIG += qt
 
 # Input
-HEADERS +=  german/lang.h config.h gamelib.h window.h wiese.h lala.h 
-SOURCES +=  main_nas.cpp gamelib.cpp window.cpp wiese.cpp lala.cpp 
+HEADERS +=  german/lang.h config.h gamelib.h window.h wiese.h nas/lala.h 
+SOURCES +=  main.cpp gamelib.cpp window.cpp wiese.cpp nas/lala.cpp 
 
 ##################################################################################

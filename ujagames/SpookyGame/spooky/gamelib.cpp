@@ -29,7 +29,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------
 viewport::viewport(QWidget* parent, char* name):QCanvasView(parent,name)
 { 
-  int xmax=XMAX/3,ymax=YMAX;                   // Daten aus config1.h des jeweiligen Programms
+  int xmax=XMAX/4,ymax=YMAX;                   // Daten aus config1.h des jeweiligen Programms
   setMinimumSize(xmax+4,ymax+4);             // feste Feldgroesse setzen, Rand mit einrechnen
   setMaximumSize(xmax+4,ymax+4);
   setHScrollBarMode(QScrollView::AlwaysOff); 

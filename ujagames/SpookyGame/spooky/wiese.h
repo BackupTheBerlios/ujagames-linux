@@ -2,13 +2,13 @@
 
 #define WIESE_H
 
+#include "lang.h"
 #include "config.h"
 #include <qcanvas.h>
 #include <qtimer.h>
 
 // und da die Qt-internen Spritemoveroutinen nur Ruckel und Zuckelgrafik bei langsameren Objekten erzeugen, 
 // muss alles, was sich bewegt, wieder auf die konventionellen Methoden umgeschrieben werden:
-
 
 class flieger
 { 
@@ -23,9 +23,6 @@ class flieger
   void move_it();
 };
 
-
-
-
 class wiese:public QCanvas
 {
   Q_OBJECT
@@ -34,6 +31,22 @@ class wiese:public QCanvas
   wiese(QWidget* parent);
   QTimer* timrec1;
   QTimer* timrec2;
+  
+  static const int num_kuerbis=4;
+  static const int num_bat=8;
+  static const int num_hexe=4;
+  static const int num_geist=8;
+  static const int num_skorpion=3;
+  static const int num_ratte=3;
+  
+  static const int num_schloss=4;
+  static const int num_baum=4;
+  static const int num_busch=5;
+  static const int num_scheune=3;
+  
+  static const int num_flamme=3;
+  
+  static const int num_psprites=50;
   
   bool sound_on;
   QWidget* oberer;
@@ -71,7 +84,14 @@ class wiese:public QCanvas
    // Erweiterung Bild 3:
    QCanvasPixmapArray* my_scheunenarray;
    QCanvasPixmapArray* my_monsterarray;
+   QCanvasPixmapArray* my_zielscheibenarray;
+   QCanvasPixmapArray* my_rattenarray;
+  
+   // Erweiterung Scene 4:
+   QCanvasPixmapArray* my_vg2array;
+   QCanvasPixmapArray* my_flammenarray;
    
+    
   
    
   flieger* mond;        // E0, li->re, 3 Durchgänge, dann gameover
@@ -85,35 +105,39 @@ class wiese:public QCanvas
   
   
   // E2-9 E12-19 E22-29:
-  flieger* kuerbis[4];  // rollen re/li
-  flieger* bat[8];      // random, nix weiter
-  flieger* hexe[4];     // re/li
-  flieger* geist[8];    // Welle?
-  flieger* skorpion[3]; // re/li im Garten, Spur 0 am Teich (19.2), Spur 1 auf Mauer (30.8) re, sp, spur 2 hinter Tor 29.8
+  flieger* kuerbis[num_kuerbis];  // rollen re/li
+  flieger* bat[num_bat];      // random, nix weiter
+  flieger* hexe[num_hexe];     // re/li
+  flieger* geist[num_geist];    // Welle?
+  flieger* skorpion[num_skorpion]; // re/li im Garten, Spur 0 am Teich (19.2), Spur 1 auf Mauer (30.8) re, sp, spur 2 hinter Tor 29.8
+  flieger* ratte[num_ratte];    // re->li, Heuhaufen rauf verschiedenen Muster
+  flieger* flamme[num_flamme];
+  
+  flieger* psprite[num_psprites]; // pro id 1 Punktesprit, id's sind pixDaumen+1
 
   
+  // Szenario:
   QCanvasSprite* titel;          // E1
   QCanvasSprite* p_vordergrund;  // E32
   QCanvasSprite* p_pause;        // E34
   QCanvasSprite* p_gover;        // E35
-  QCanvasSprite* schloss[4];     // E10, E20
+  QCanvasSprite* schloss[num_schloss];     // E10, E20 2 Türme, 1 Fried, 1 Mauer
   QCanvasSprite* tuer;           // E21
-  QCanvasSprite* baum[5];        // E10, E30
-  QCanvasSprite* topf;          // E1
-  
+  QCanvasSprite* baum[num_baum]; // E10, E30
+  QCanvasSprite* topf;           // E1
   QCanvasSprite* shooter;        // E33
   QCanvasSprite* hotspot;        // E33
-  
-  flieger* psprite[40]; // pro id 1 Punktesprit
-  
-  // Erweiterung Level 2::
+    
+  // Erweiterung Scene 2 2::
   QCanvasSprite* mauer;    // E30.5
-  QCanvasSprite* busch[4]; // E30,E20,E20,E10
+  QCanvasSprite* busch[num_busch]; // E30,E20,E20,E10
   
-  // Erweiterung Level 3:
-  QCanvasSprite* scheune[3]; // E15.5,E20,E30.7
+  // Erweiterung Scene3 3:
+  QCanvasSprite* scheune[num_scheune]; // E15.5,E20,E30.7 = hinten mitte, vorne
+  QCanvasSprite* zielscheibe;
   
-  
+  // Erweiterung Scene 4
+  QCanvasSprite* vg2; // E34
   
   
   
@@ -140,6 +164,8 @@ class wiese:public QCanvas
   void starte_pilz();
   void starte_skorpion();
   void starte_monster();
+  void starte_ratten();
+  void starte_flammen();
   
   void mond_getroffen();
   void spinne_getroffen();
@@ -155,6 +181,8 @@ class wiese:public QCanvas
   void pilz_getroffen();
   void skorpion_getroffen(int);
   void monster_getroffen();
+  void ratte_getroffen(int);
+  void flamme_getroffen(int);
   
   void zeige_punkte(flieger*,int);
   
@@ -180,6 +208,9 @@ class wiese:public QCanvas
   void move_skorpion(int);
   
   void move_monster();
+  void move_ratte(int);
+  
+  void move_flamme(int);
   
    
   public slots:
@@ -202,6 +233,7 @@ class wiese:public QCanvas
   void zeige_view(int,int);
   void focus2playfield();
   void scrollit(int);
+  void messi(QString);
   
   void play_lala(bool,int);
 } ;

@@ -36,7 +36,7 @@
 #include "window.h"   // Hauptfenster Darstellung
 #include "wiese.h"    // Gameparameter und -routinen 
 
-#include "lala_arts.h" // Mucke
+#include "lala.h"     // Mucke
 
 // ===============================================================================
 
@@ -158,7 +158,12 @@ int main(int argc, char **argv)
   
   my_wiese->my_scheunenarray=new QCanvasPixmapArray("./images/scheune_%1.png",3);
   my_wiese->my_monsterarray =new QCanvasPixmapArray("./images/monster_%1.png",8);
+  my_wiese->my_zielscheibenarray=new QCanvasPixmapArray("./images/zielscheibe.png");
+  my_wiese->my_rattenarray =new QCanvasPixmapArray("./images/ratte_%1.png",4);
  
+  my_wiese->my_vg2array =new QCanvasPixmapArray("./images/vg2.png");
+  my_wiese->my_flammenarray =new QCanvasPixmapArray("./images/flaemmchen_%1.png",12);
+  
    // Check auf Vollstaendigkeit der Bilder:
   QString err="";
   if (!my_wiese->my_mondarray->isValid())    err=err+"The moon is missing!\n";
@@ -195,8 +200,12 @@ int main(int argc, char **argv)
 
   // Level 3: zerfallene Scheune: Ratten, B.subtilis, Tonnenmonster, Flugbesen
   if (!my_wiese->my_scheunenarray->isValid())  err=err+"The barn is missing!\n";
-  if (!my_wiese->my_scheunenarray->isValid())  err=err+"The monster is missing!\n";
+  if (!my_wiese->my_monsterarray->isValid())  err=err+"The monster is missing!\n";
+  if (!my_wiese->my_zielscheibenarray->isValid()) err=err+"The wall painting is missing!\n";
+  if (!my_wiese->my_rattenarray->isValid())  err=err+"The rats are missing!\n";
   
+  if (!my_wiese->my_vg2array->isValid())  err=err+"The timber is missing!\n";
+  if (!my_wiese->my_flammenarray->isValid())  err=err+"No flames available!\n";
   
     
   if (err=="")  // Spritebelegung und Initialisierung:
@@ -206,12 +215,13 @@ int main(int argc, char **argv)
     // statische Sprites:
     my_wiese->p_gover=new QCanvasSprite(my_wiese->my_goverarray,my_canvas);
     my_wiese->p_pause=new QCanvasSprite(my_wiese->my_pausearray,my_canvas);
-    my_wiese->p_pause->setZ(35); my_wiese->p_pause->move(0,128);     // pause zweitoberste Prioritaet
-    my_wiese->p_gover->setZ(36); my_wiese->p_gover->move(0,128);     // gameover oberste Prioritaet    
+    my_wiese->p_pause->setZ(38); my_wiese->p_pause->move(0,128);     // pause zweitoberste Prioritaet
+    my_wiese->p_gover->setZ(39); my_wiese->p_gover->move(0,128);     // gameover oberste Prioritaet    
     my_wiese->titel=new QCanvasSprite(my_wiese->my_titelarray,my_canvas);
     my_wiese->titel->setZ(1); my_wiese->titel->move(300,8); 
     my_wiese->titel->show();   
-    for (i=0; i<4; i++) my_wiese->baum[i]=new QCanvasSprite(my_wiese->my_baumarray,my_canvas);
+
+    for (i=0; i<my_wiese->num_baum; i++) my_wiese->baum[i]=new QCanvasSprite(my_wiese->my_baumarray,my_canvas);
     for (i=0; i<2; i++)
     { my_wiese->baum[i]->setZ(10); 
       my_wiese->baum[i+2]->setZ(30); 
@@ -220,16 +230,16 @@ int main(int argc, char **argv)
     my_wiese->baum[1]->move(480,80,1);
     my_wiese->baum[2]->move(400,72,0);
     my_wiese->baum[3]->move(-128,72,0);
-    for (i=0; i<4; i++) my_wiese->baum[i]->show(); 
+    for (i=0; i<my_wiese->num_baum; i++) my_wiese->baum[i]->show(); 
 
-    for (i=0; i<4; i++)  my_wiese->schloss[i]=new QCanvasSprite(my_wiese->my_schlossarray,my_canvas);
+    for (i=0; i<my_wiese->num_schloss; i++)  my_wiese->schloss[i]=new QCanvasSprite(my_wiese->my_schlossarray,my_canvas);
     my_wiese->schloss[0]->setZ(10);
-    for (i=1; i<4; i++) my_wiese->schloss[i]->setZ(20);
+    for (i=1; i<my_wiese->num_schloss; i++) my_wiese->schloss[i]->setZ(20);
     my_wiese->schloss[0]->move(272,160,0);
     my_wiese->schloss[1]->move(176,208,1);
     my_wiese->schloss[2]->move(112,144,2);
     my_wiese->schloss[3]->move(416,176,3);
-    for (i=0; i<4; i++) my_wiese->schloss[i]->show();
+    for (i=0; i<my_wiese->num_schloss; i++) my_wiese->schloss[i]->show();
     my_wiese->tuer=new QCanvasSprite(my_wiese->my_tuerarray,my_canvas);
     my_wiese->tuer->setZ(21); my_wiese->tuer->move(268,282);
     my_wiese->tuer->show();
@@ -239,28 +249,36 @@ int main(int argc, char **argv)
     my_wiese->topf->show();
     
     my_wiese->p_vordergrund=new QCanvasSprite(my_wiese->my_vgarray,my_canvas);
-    my_wiese->p_vordergrund->setZ(32); my_wiese->p_vordergrund->move(0,368);
+    my_wiese->p_vordergrund->setZ(34); my_wiese->p_vordergrund->move(0,368);
     my_wiese->p_vordergrund->show();
  
     my_wiese->mauer=new QCanvasSprite(my_wiese->my_mauerarray,my_canvas);
-    my_wiese->mauer->setZ(30.5); my_wiese->mauer->move(680,288);
+    my_wiese->mauer->setZ(31); my_wiese->mauer->move(680,288);
     my_wiese->mauer->show();
  
 //    printf("Level 2 ab x=640:\n");
-    for (i=0; i<5; i++) my_wiese->busch[i]=new QCanvasSprite(my_wiese->my_buscharray,my_canvas);
-    my_wiese->busch[0]->move(1040,144,1); my_wiese->busch[0]->setZ(29.2);
-    my_wiese->busch[1]->move(752,256,0); my_wiese->busch[1]->setZ(29.2);
-    my_wiese->busch[2]->move(976,256,0); my_wiese->busch[2]->setZ(29.2);
+    for (i=0; i<my_wiese->num_busch; i++) my_wiese->busch[i]=new QCanvasSprite(my_wiese->my_buscharray,my_canvas);
+    my_wiese->busch[0]->move(1040,144,1); my_wiese->busch[0]->setZ(28);
+    my_wiese->busch[1]->move(752,256,0); my_wiese->busch[1]->setZ(28);
+    my_wiese->busch[2]->move(976,256,0); my_wiese->busch[2]->setZ(28);
     my_wiese->busch[3]->move(800,188,0); my_wiese->busch[3]->setZ(10); 
-    my_wiese->busch[4]->move(640,320,0); my_wiese->busch[4]->setZ(29.7); 
-    for (i=0; i<5; i++) my_wiese->busch[i]->show();
+    my_wiese->busch[4]->move(640,320,0); my_wiese->busch[4]->setZ(30);
+    for (i=0; i<my_wiese->num_busch; i++) my_wiese->busch[i]->show();
     
 //    printf("Level 3 ab 1280:\n");
-    for (i=0; i<3; i++) my_wiese->scheune[i]=new QCanvasSprite(my_wiese->my_scheunenarray,my_canvas);
+    for (i=0; i<my_wiese->num_scheune; i++) my_wiese->scheune[i]=new QCanvasSprite(my_wiese->my_scheunenarray,my_canvas);
     my_wiese->scheune[0]->move(1380,96,0); my_wiese->scheune[0]->setZ(20);
-    my_wiese->scheune[1]->move(1420,96,1); my_wiese->scheune[1]->setZ(25.1);
-    my_wiese->scheune[2]->move(1380,32,2); my_wiese->scheune[2]->setZ(30.7);
-    for (i=0; i<3; i++) my_wiese->scheune[i]->show();
+    my_wiese->scheune[1]->move(1420,96,1); my_wiese->scheune[1]->setZ(25);
+    my_wiese->scheune[2]->move(1380,32,2); my_wiese->scheune[2]->setZ(30);
+    for (i=0; i<my_wiese->num_scheune; i++) my_wiese->scheune[i]->show();
+    
+    my_wiese->zielscheibe=new QCanvasSprite(my_wiese->my_zielscheibenarray,my_canvas);
+    my_wiese->zielscheibe->setZ(26); my_wiese->zielscheibe->move(my_wiese->scheune[1]->x()+278,my_wiese->scheune[1]->y()+92);
+    my_wiese->zielscheibe->show();
+    
+    my_wiese->vg2=new QCanvasSprite(my_wiese->my_vg2array,my_canvas);
+    my_wiese->vg2->setZ(34); my_wiese->vg2->move(1940,320);
+    my_wiese->vg2->show();
     
     
  // --------------------------------------------------------------------------------------
@@ -273,7 +291,7 @@ int main(int argc, char **argv)
     my_wiese->mond->p_sprite->show();
 
     my_wiese->spinne->p_sprite=new QCanvasSprite(my_wiese->my_spinnenarray,my_canvas);
-    my_wiese->spinne->p_sprite->setZ(31); my_wiese->spinne->p_sprite->hide();
+    my_wiese->spinne->p_sprite->setZ(32); my_wiese->spinne->p_sprite->hide();
     my_wiese->spinne->p_sprite->setVelocity(0,0);
          
     my_wiese->katze->p_sprite=new QCanvasSprite(my_wiese->my_katzenarray,my_canvas);
@@ -290,58 +308,71 @@ int main(int argc, char **argv)
     my_wiese->waber->p_sprite->hide();
     my_wiese->waber->p_sprite->setVelocity(0,0);    
       
-    for (i=0; i<4; i++) 
+    for (i=0; i<my_wiese->num_kuerbis; i++) 
     { my_wiese->kuerbis[i]->p_sprite=new QCanvasSprite(my_wiese->my_kuerbisarray,my_canvas);
       my_wiese->kuerbis[i]->phase=-1; my_wiese->kuerbis[i]->p_sprite->hide();
       my_wiese->kuerbis[i]->p_sprite->setVelocity(0,0);
     }
-    for (i=0; i<4; i++) 
+    for (i=0; i<my_wiese->num_hexe; i++) 
     { my_wiese->hexe[i]->p_sprite=new QCanvasSprite(my_wiese->my_hexenarray,my_canvas);
       my_wiese->hexe[i]->phase=-1; my_wiese->hexe[i]->p_sprite->hide();
       my_wiese->hexe[i]->p_sprite->setVelocity(0,0);
     }    
-    for (i=0; i<8; i++) 
+    for (i=0; i<my_wiese->num_bat; i++) 
     { my_wiese->bat[i]->p_sprite=new QCanvasSprite(my_wiese->my_batarray,my_canvas);
       my_wiese->bat[i]->phase=-1; my_wiese->bat[i]->p_sprite->hide();
       my_wiese->bat[i]->p_sprite->setVelocity(0,0);
     }
-    for (i=0; i<8; i++) 
+    for (i=0; i<my_wiese->num_geist; i++) 
     { my_wiese->geist[i]->p_sprite=new QCanvasSprite(my_wiese->my_geistarray,my_canvas);
       my_wiese->geist[i]->phase=-1; my_wiese->geist[i]->p_sprite->hide();
       my_wiese->geist[i]->p_sprite->setVelocity(0,0);
     }
-    for (i=0; i<40; i++) 
+    for (i=0; i<my_wiese->num_psprites; i++) 
     { my_wiese->psprite[i]->p_sprite=new QCanvasSprite(my_wiese->my_punktearray,my_canvas);
       my_wiese->psprite[i]->p_sprite->hide(); my_wiese->psprite[i]->p_sprite->setVelocity(0,0);
     }
 
     my_wiese->shooter=new QCanvasSprite(my_wiese->my_shooterarray,my_canvas);
-    my_wiese->shooter->setZ(33); my_wiese->shooter->move(540,360); 
+    my_wiese->shooter->setZ(36); my_wiese->shooter->move(540,360); 
     my_wiese->shooter->show();
     my_wiese->hotspot=new QCanvasSprite(my_wiese->my_hotspotarray,my_canvas);
-    my_wiese->hotspot->setZ(34); my_wiese->hotspot->move(588,384); 
+    my_wiese->hotspot->setZ(37); my_wiese->hotspot->move(588,384); 
     my_wiese->hotspot->show();
     
 //  printf("Level 2: neue Sprites: Pilz, Floh, Skorpione:\n");
     my_wiese->pilz->p_sprite=new QCanvasSprite(my_wiese->my_pilzarray,my_canvas);
-    my_wiese->pilz->p_sprite->setZ(9.9); my_wiese->pilz->p_sprite->move(860,256); 
+    my_wiese->pilz->p_sprite->setZ(9.5); my_wiese->pilz->p_sprite->move(860,256); 
     
     my_wiese->floh->p_sprite=new QCanvasSprite(my_wiese->my_floharray,my_canvas);
-    my_wiese->floh->p_sprite->setZ(29.6); my_wiese->floh->p_sprite->hide();
+    my_wiese->floh->p_sprite->setZ(30.5); my_wiese->floh->p_sprite->hide();
     my_wiese->floh->phase=-1;
     
-    for (i=0; i<3; i++) 
+    for (i=0; i<my_wiese->num_skorpion; i++) 
     { my_wiese->skorpion[i]->p_sprite=new QCanvasSprite(my_wiese->my_skorparray,my_canvas);
       my_wiese->skorpion[i]->phase=-1; my_wiese->skorpion[i]->p_sprite->hide();
       my_wiese->skorpion[i]->p_sprite->setVelocity(0,0);
     }
           
     
- // printf("Level 3: neue Sprites: Tonne, Monster, Ratten, Subtilis, Besen:\n");
+//  printf("Level 3: neue Sprites: kleines Monster, Ratten:\n");
+
     my_wiese->monster->p_sprite=new QCanvasSprite(my_wiese->my_monsterarray,my_canvas);
     my_wiese->monster->p_sprite->setZ(29.6); my_wiese->monster->p_sprite->hide();
     my_wiese->monster->phase=-1;
+
+    for (i=0; i<my_wiese->num_ratte; i++) 
+    { my_wiese->ratte[i]->p_sprite=new QCanvasSprite(my_wiese->my_rattenarray,my_canvas);
+      my_wiese->ratte[i]->phase=-1; my_wiese->ratte[i]->p_sprite->hide();
+      my_wiese->ratte[i]->p_sprite->setVelocity(0,0);
+    }
     
+
+    for (i=0; i<my_wiese->num_flamme; i++) 
+    { my_wiese->flamme[i]->p_sprite=new QCanvasSprite(my_wiese->my_flammenarray,my_canvas);
+      my_wiese->flamme[i]->phase=-1; my_wiese->flamme[i]->p_sprite->hide();
+      my_wiese->flamme[i]->p_sprite->setVelocity(0,0);
+    }
 
        
    // --- Ende Spritegenerierung -------------------------------------------
@@ -374,14 +405,13 @@ int main(int argc, char **argv)
   my_app.connect(my_window,SIGNAL(key_pressed(int)),my_wiese,SLOT(keyhandle(int)));     // Keypress im Spielfeld
   my_app.connect(my_wiese,SIGNAL(focus2playfield()),my_window,SLOT(grab_focus()));
   my_app.connect(my_wiese,SIGNAL(scrollit(int)),my_window,SLOT(scroll_it(int)));
-  my_app.connect(my_window,SIGNAL(gescrollt(int)),my_wiese,SLOT(shooterupdate(int)));     
- 
+  my_app.connect(my_window,SIGNAL(gescrollt(int)),my_wiese,SLOT(shooterupdate(int))); 
+  my_app.connect(my_wiese,SIGNAL(messi(QString)),my_window,SLOT(set_messi(QString)));
+
   my_app.connect(my_wiese,SIGNAL(play_lala(bool,int)),my_lala,SLOT(mach_lala(bool,int)));
 
 // ---------------------------------------------------  
-  
-  
-  
+
 // ----------------------------------------------------  
 //  printf("starte spiel\n");  
   QPixmap my_pixmap=QPixmap(PROGICON);                                            // Programmicon setzen  

@@ -1,24 +1,25 @@
 Readme Spooky Shooter für aRts (KDE) Soundserver
 -------------------------------------------------
 
-Spooky Shooter: (c) Ulrike Jahnke-Soltau (uja)
-aRts-Plugin   : (c) Kevin Krammer
+Spooky Shooter: Ulrike Jahnke-Soltau (uja)
+aRts-Plugin   : Kevin Krammer
 
 Dependencies:
 ----------------
-Linux, KDE3, aRts-Soundserver, Qt3
-If aRts is not found, the program tries NAS, an X11 soundserver),
-if Qt is compiled with the useflag NAS.
-If it does not find NAS either, there is no sound.
+Linux, KDE3, aRts(KDE) or NAS(X11) soundserver, Qt3
+
+If aRts is not found, take the NAS version.
+If Qt is compiled with the useflag NAS and the
+soundserver ist found, there is sound, otherwise not,
+but the game is playable.
 ------------------------------------------------------
 
 Installation:
 -------------
-Start ./install_spooky_arts_engl.cmd and wait until it has finished.
+aRts:			./install_spooky_arts_engl.cmd
+NAS or no sound:	./install_spooky_nas_engl.cmd
 
-
-If the directories cannot be found, type
-./install_spooky_nas_engl.pro
-
-This will install the english version with NAS or no sound.
-================================================================
+Wait until compiler and linker are ready.
+Start game by pointing to spooky, enter:
+./spooky
+========================================================

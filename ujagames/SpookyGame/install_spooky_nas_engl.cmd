@@ -32,6 +32,7 @@ for i in $( ls moc*  )
 do 
   rm $i
 done
+rm ./nas/moc*
 rm Makefile
 
 echo "... done!"
