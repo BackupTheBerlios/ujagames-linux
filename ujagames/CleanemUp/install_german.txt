@@ -1,0 +1,29 @@
+------------------------------------------------
+Installation ujas Qt-Spiele
+------------------------------------------------
+
+Installation:
+--------------------
+1. Entpacke das Archiv in ein Verzeichnis deiner Wahl,
+2. Wechsle in dieses Verzeichnis, dann ins Unterverzeichnis raeumen
+3. rufe auf: 
+   qmake raeumen
+   make
+   warte, bis Compiler und Linker fertig sind.   
+
+4. Starte das Programm mit ./raeumen,
+   aus dem Datei-Manager
+   oder erstelle dir ein Icon auf der Arbeitsoberfläche 
+
+Konfiguration/Configuration
+----------------------------
+Falls du nur lokal spielst, kannst du die Schritte 1 und 2 überspringen.
+1. Öffne die Datei hiscore.ini
+2. Trage in der 2. Zeile den Netzwerk-Hiscore-Pfad ein nach vorgegebenem Muster.
+   Du brauchst Lese/Schreibrechte für diesen Pfad.
+   Im Spiel kannst du über Menu2 von lokaler Liste auf Netzliste wechseln.
+3. Nach Start des Spiels setze in Menu1 für jeden Hiscore-Pfad einmal die Liste zurück.
+-----------------------------------------------------------------------------------------
+
+   
+   

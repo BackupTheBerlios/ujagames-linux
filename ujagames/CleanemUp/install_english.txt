@@ -1,0 +1,35 @@
+------------------------------------------------
+Installation ujas Qt-Spiele
+------------------------------------------------
+
+Installation:
+--------------------
+1. Unpack the archive into a directory of your choice.
+2. Change to this directory, change to its subdirectory raeumen.
+
+3. open a command line interface (console), enter:
+   qmake cleanemup
+   make
+   wait until compilation and linking is finished.
+   
+4. start game from the CLI by typing ./cleanemup,
+   or start game from a directory manager by (double-) clicking,
+   or make a link/icon on the desktop pointing to this program,
+   work directory: the directory cleanup is in.
+           
+
+Configuration:
+----------------------------
+If you want to play only on your local machine, you may skip steps 1 and 2.
+
+1. Open the file hiscore.ini
+
+2. Set the path in the second line to your network path.
+   You need Read/Write permission for this path.
+   You may switch the actual List via Menu2.
+   
+3. After starting the game reset every hiscore list via Menu1.
+-----------------------------------------------------------------------------------------
+
+   
+   
